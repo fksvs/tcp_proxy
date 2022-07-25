@@ -1,0 +1,6 @@
+A simple TCP Proxy I wrote for fun.
+-----------------------------------
+You should change the addresses and ports in the source code (which is defined) to use it.
+
+It listens on LISTEN_ADDRESS-LISTEN_PORT for incoming clients and
+connects to CONN_ADDRESS-CONN_PORT.
