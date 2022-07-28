@@ -70,8 +70,7 @@ void handle_client(int client_sock)
 
 	if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		close_client(client_sock, server_sock);
-	if (connect(server_sock, (struct sockaddr *)&server, sizeof(server)) <
-	    0)
+	if (connect(server_sock, (struct sockaddr *)&server, sizeof(server)) < 0)
 		close_client(client_sock, server_sock);
 	if (fork() == 0)
 		listen_data(server_sock, client_sock);
@@ -112,11 +111,9 @@ void init_server()
 
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		die("[ERROR] [socket] ");
-	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) <
-	    0)
+	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
 		die("[ERROR] [setsockopt] ");
-	if (bind(sockfd, (struct sockaddr *)&server,
-		 sizeof(struct sockaddr_in)) < 0)
+	if (bind(sockfd, (struct sockaddr *)&server, sizeof(struct sockaddr_in)) < 0)
 		die("[ERROR] [bind] ");
 	if (listen(sockfd, BACKLOG) < 0)
 		die("[ERROR] [listen] ");
