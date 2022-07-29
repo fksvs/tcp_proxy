@@ -8,12 +8,11 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-char *listen_address = "127.0.0.1", *conn_address = NULL;
-int listen_port = 4006, conn_port = 0;
-
 #define BUFF_SIZE 4096
 #define BACKLOG 10
 
+char *listen_address = "127.0.0.1", *conn_address = NULL;
+int listen_port = 4006, conn_port = 0;
 int sockfd;
 
 void close_server()
@@ -27,7 +26,7 @@ void close_server()
 	exit(0);
 }
 
-void die(char *err)
+void die(const char *err)
 {
 	perror(err);
 	close_server();
@@ -56,7 +55,7 @@ void listen_data(int listen_socket, int send_socket)
 	exit(0);
 }
 
-void handle_client(int client_sock)
+int handle_client(int client_sock)
 {
 	struct sockaddr_in server;
 	int server_sock;
@@ -68,7 +67,7 @@ void handle_client(int client_sock)
 
 	if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		close_client(client_sock, server_sock);
-	if (connect(server_sock, (struct sockaddr *)&server, sizeof(server)) < 0)
+        if (connect(server_sock, (struct sockaddr *)&server, sizeof(server)) < 0)
 		close_client(client_sock, server_sock);
 	if (fork() == 0)
 		listen_data(server_sock, client_sock);
@@ -120,12 +119,12 @@ void init_server()
 }
 
 void parser(int argc, char *argv[]){
-        char *usage="usage : proxy [options]\n\ options : \n\
+        char *usage = "\nusage : proxy [options]\n\n options : \n\
     -a [address] : listen address\n\
     -p [port]    : listen port\n\n\
     -d [address] : host address to connect\n\
     -r [port]    : host port to connect\n\n\
-    -h           : help\n\n\";
+    -h           : help\n\n";
         int opt;
 
         while ((opt = getopt(argc, argv, "a:d:p:r:h")) != -1){
@@ -134,7 +133,7 @@ void parser(int argc, char *argv[]){
                         listen_address = optarg;
                         break;
                 case 'd':
-                        conn_port = optarg;
+                        conn_address = optarg;
                         break;
                 case 'p':
                         listen_port = atoi(optarg);
@@ -144,7 +143,7 @@ void parser(int argc, char *argv[]){
                         break;
                 case 'h':
                         printf("%s", usage);
-                        break;
+                        exit(0);
                 }
         }
         if (conn_address == NULL || conn_port == 0){
@@ -153,7 +152,7 @@ void parser(int argc, char *argv[]){
         }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
         parser(argc, argv);
 	init_server();
