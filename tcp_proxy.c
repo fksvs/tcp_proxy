@@ -8,10 +8,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#define LISTEN_ADDRESS "127.0.0.1"
-#define LISTEN_PORT 4006
-#define CONN_ADDRESS "127.0.0.1"
-#define CONN_PORT 5000
+char *listen_address = "127.0.0.1", *conn_address = NULL;
+int listen_port = 4006, conn_port = 0;
 
 #define BUFF_SIZE 4096
 #define BACKLOG 10
@@ -25,8 +23,7 @@ void close_server()
 
 	shutdown(sockfd, SHUT_RDWR);
 	close(sockfd);
-	while ((wpid = wait(&status)) > 0)
-		;
+	while ((wpid = wait(&status)) > 0);
 	exit(0);
 }
 
@@ -66,8 +63,8 @@ void handle_client(int client_sock)
 
 	memset(&server, 0, sizeof(server));
 	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = inet_addr(CONN_ADDRESS);
-	server.sin_port = htons(CONN_PORT);
+	server.sin_addr.s_addr = inet_addr(conn_address);
+	server.sin_port = htons(conn_port);
 
 	if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		close_client(client_sock, server_sock);
@@ -107,8 +104,8 @@ void init_server()
 
 	memset(&server, 0, sizeof(server));
 	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = inet_addr(LISTEN_ADDRESS);
-	server.sin_port = htons(LISTEN_PORT);
+	server.sin_addr.s_addr = inet_addr(listen_address);
+	server.sin_port = htons(listen_port);
 
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		die("[ERROR] [socket] ");
@@ -122,8 +119,43 @@ void init_server()
 	accept_connection();
 }
 
+void parser(int argc, char *argv[]){
+        char *usage="usage : proxy [options]\n\ options : \n\
+    -a [address] : listen address\n\
+    -p [port]    : listen port\n\n\
+    -d [address] : host address to connect\n\
+    -r [port]    : host port to connect\n\n\
+    -h           : help\n\n\";
+        int opt;
+
+        while ((opt = getopt(argc, argv, "a:d:p:r:h")) != -1){
+                switch (opt){
+                case 'a':
+                        listen_address = optarg;
+                        break;
+                case 'd':
+                        conn_port = optarg;
+                        break;
+                case 'p':
+                        listen_port = atoi(optarg);
+                        break;
+                case 'r':
+                        conn_port = atoi(optarg);
+                        break;
+                case 'h':
+                        printf("%s", usage);
+                        break;
+                }
+        }
+        if (conn_address == NULL || conn_port == 0){
+                printf("%s", usage);
+                exit(0);
+        }
+}
+
 int main()
 {
+        parser(argc, argv);
 	init_server();
 
 	return 0;
