@@ -55,7 +55,7 @@ void listen_data(int listen_socket, int send_socket)
 	exit(0);
 }
 
-int handle_client(int client_sock)
+void handle_client(int client_sock)
 {
 	struct sockaddr_in server;
 	int server_sock;
