@@ -122,8 +122,8 @@ void parser(int argc, char *argv[]){
         char *usage = "\nusage : proxy [options]\n\n options : \n\
     -a [address] : listen address\n\
     -p [port]    : listen port\n\n\
-    -d [address] : host address to connect\n\
-    -r [port]    : host port to connect\n\n\
+    -d [address] : remote address to connect\n\
+    -r [port]    : remote port to connect\n\n\
     -h           : help\n\n";
         int opt;
 
